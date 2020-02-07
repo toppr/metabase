@@ -42,7 +42,8 @@ export default class DashboardGrid extends Component {
   }
 
   static propTypes = {
-    isEditing: PropTypes.bool.isRequired,
+    isEditing: PropTypes.oneOfType([PropTypes.bool, PropTypes.object])
+      .isRequired,
     isEditingParameter: PropTypes.bool.isRequired,
     dashboard: PropTypes.object.isRequired,
     parameterValues: PropTypes.object.isRequired,
@@ -223,9 +224,11 @@ export default class DashboardGrid extends Component {
           this,
           dc.id,
         )}
+        mode={this.props.mode}
         navigateToNewCardFromDashboard={
           this.props.navigateToNewCardFromDashboard
         }
+        onChangeLocation={this.props.onChangeLocation}
         metadata={this.props.metadata}
         dashboard={this.props.dashboard}
       />

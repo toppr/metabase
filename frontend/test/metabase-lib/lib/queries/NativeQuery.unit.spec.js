@@ -2,6 +2,7 @@ import { assocIn } from "icepick";
 
 import {
   SAMPLE_DATASET,
+  PRODUCTS,
   MONGO_DATABASE,
 } from "__support__/sample_dataset_fixture";
 
@@ -126,6 +127,21 @@ describe("NativeQuery", () => {
       });
     });
   });
+  describe("clean", () => {
+    it("should add template-tags: {} if there are none", () => {
+      const cleanedQuery = native =>
+        new NativeQuery(SAMPLE_DATASET.question(), {
+          type: "native",
+          database: SAMPLE_DATASET.id,
+          native,
+        })
+          .clean()
+          .datasetQuery();
+      const q1 = cleanedQuery({ query: "select 1" });
+      const q2 = cleanedQuery({ query: "select 1", "template-tags": {} });
+      expect(q1).toEqual(q2);
+    });
+  });
   describe("Acessing the underlying native query", () => {
     describe("You can access the actual native query via queryText()", () => {
       expect(makeQuery("SELECT * FROM ORDERS").queryText()).toEqual(
@@ -195,6 +211,45 @@ describe("NativeQuery", () => {
         ),
       );
       expect(q.canRun()).toBe(true);
+    });
+  });
+  describe("variables", () => {
+    it("should return empty array if there are no tags", () => {
+      const q = makeQuery().setQueryText("SELECT * FROM PRODUCTS");
+      const variables = q.variables();
+      expect(variables).toHaveLength(0);
+    });
+    it("should return variable for non-dimension template tag", () => {
+      const q = makeQuery().setQueryText(
+        "SELECT * FROM PRODUCTS WHERE CATEGORY = {{category}}",
+      );
+      const variables = q.variables();
+      expect(variables).toHaveLength(1);
+      expect(variables.map(v => v.displayName())).toEqual(["category"]);
+    });
+    it("should not return variable for dimension template tag", () => {
+      const q = makeQuery()
+        .setQueryText("SELECT * FROM PRODUCTS WHERE {{category}}")
+        .setTemplateTag("category", { name: "category", type: "dimension" });
+      expect(q.variables()).toHaveLength(0);
+    });
+  });
+  describe("dimensionOptions", () => {
+    it("should return empty dimensionOptions if there are no tags", () => {
+      const q = makeQuery().setQueryText("SELECT * FROM PRODUCTS");
+      expect(q.dimensionOptions().count).toBe(0);
+    });
+    it("should return a dimension for a dimension template tag", () => {
+      const q = makeQuery()
+        .setQueryText("SELECT * FROM PRODUCTS WHERE {{category}}")
+        .setTemplateTag("category", {
+          name: "category",
+          type: "dimension",
+          dimension: ["field-id", PRODUCTS.CATEGORY.id],
+        });
+      const dimensions = q.dimensionOptions().dimensions;
+      expect(dimensions).toHaveLength(1);
+      expect(dimensions.map(d => d.displayName())).toEqual(["Category"]);
     });
   });
 });
