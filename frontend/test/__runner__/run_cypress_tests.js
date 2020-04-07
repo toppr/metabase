@@ -9,6 +9,8 @@ const server = BackendResource.get({ dbKey: "" });
 
 const userArgs = process.argv.slice(2);
 const isOpenMode = userArgs[0] === "--open";
+const testFiles = userArgs[1] === "--testFiles";
+const testFilesLocation = userArgs[2];
 
 function readFile(fileName) {
   return new Promise(function(resolve, reject) {
@@ -26,6 +28,14 @@ const init = async () => {
     console.log(
       chalk.yellow(
         "If you are developing locally, prefer using `yarn test-cypress-open` instead.\n",
+      ),
+    );
+  }
+
+  if (testFiles) {
+    console.log(
+      chalk.bold(
+        `Running tests in '${testFilesLocation}'`
       ),
     );
   }
@@ -54,6 +64,11 @@ const init = async () => {
   await BackendResource.start(server);
 
   console.log(chalk.bold("Starting Cypress"));
+  let commandLineConfig = `baseUrl=${server.host}`;
+  if (testFiles) {
+    commandLineConfig = `${commandLineConfig},integrationFolder=${testFilesLocation}`;
+  }
+
   const cypressProcess = spawn(
     "yarn",
     [
@@ -62,7 +77,7 @@ const init = async () => {
       "--config-file",
       process.env["CONFIG_FILE"],
       "--config",
-      `baseUrl=${server.host}`,
+      commandLineConfig,
       ...(process.env["CI"]
         ? [
             "--reporter",
