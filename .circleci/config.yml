@@ -560,11 +560,21 @@ jobs:
                 command: ./bin/build version
 
   fe-tests-cypress:
-    executor: clojure-and-node
+    parameters:
+      e:
+        type: executor
+        default: clojure-and-node
+      only-single-database:
+        type: boolean
+        default: false
+      test-files-location:
+        type: string
+        default: ""
+    executor: << parameters.e >>
     steps:
       - run-yarn-command:
           command-name: Run Cypress tests
-          command: run test-cypress-no-build
+          command: run test-cypress-no-build <<# parameters.only-single-database >> --testFiles << parameters.test-files-location >> <</ parameters.only-single-database >>
           before-steps:
             - restore_cache:
                 keys:
@@ -851,6 +861,15 @@ workflows:
           requires:
             - build-uberjar
             - fe-deps
+
+      - fe-tests-cypress:
+          name: fe-tests-cypress-mongo
+          requires:
+            - build-uberjar
+            - fe-deps
+          e: mongo
+          only-single-database: true
+          test-files-location: frontend/test/metabase/mongo
 
       - deploy-master:
           requires:

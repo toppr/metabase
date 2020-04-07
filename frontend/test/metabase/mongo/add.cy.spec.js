@@ -7,13 +7,6 @@ function typeField(label, value) {
     .blur();
 }
 
-function toggleFieldWithDisplayName(displayName) {
-  cy.contains(displayName)
-    .closest(".Form-field")
-    .find("a")
-    .click();
-}
-
 function addMongoDatabase() {
   cy.visit("/admin/databases/create");
   cy.contains("Database type")
