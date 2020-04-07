@@ -170,6 +170,11 @@ executors:
           ACCEPT_EULA: Y
           SA_PASSWORD: 'P@ssw0rd'
 
+  fe-mongo:
+    working_directory: /home/circleci/metabase/metabase/
+    docker:
+      - image: circleci/clojure:lein-2.8.1-node-browsers
+      - image: circleci/mongo:4.0
 
 
 ########################################################################################################################
@@ -867,7 +872,7 @@ workflows:
           requires:
             - build-uberjar
             - fe-deps
-          e: mongo
+          e: fe-mongo
           only-single-database: true
           test-files-location: frontend/test/metabase/mongo
 
