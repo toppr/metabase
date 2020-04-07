@@ -33,11 +33,7 @@ const init = async () => {
   }
 
   if (testFiles) {
-    console.log(
-      chalk.bold(
-        `Running tests in '${testFilesLocation}'`
-      ),
-    );
+    console.log(chalk.bold(`Running tests in '${testFilesLocation}'`));
   }
 
   try {

@@ -94,7 +94,7 @@ describe("mongodb > user > query", () => {
     modal()
       .contains("Not now")
       .click();
-    
+
     cy.url().should("match", /\/question\/\d+$/);
   });
 });

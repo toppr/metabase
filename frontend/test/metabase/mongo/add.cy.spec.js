@@ -16,10 +16,11 @@ function toggleFieldWithDisplayName(displayName) {
 
 function addMongoDatabase() {
   cy.visit("/admin/databases/create");
-  cy.contains("Database type").closest(".Form-field")
+  cy.contains("Database type")
+    .closest(".Form-field")
     .find("a")
     .click();
-  cy.contains("MongoDB").click({force: true});
+  cy.contains("MongoDB").click({ force: true });
   cy.contains("Additional Mongo connection");
 
   typeField("Name", "MongoDB");
@@ -49,16 +50,18 @@ describe("mongodb > admin > add", () => {
 
     cy.url().should("match", /\/admin\/databases\?created=\d+$/);
     cy.contains("Your database has been added!");
-    modal().contains("I'm good thanks").click();
+    modal()
+      .contains("I'm good thanks")
+      .click();
   });
 
   it("can query a Mongo database", () => {
     addMongoDatabase();
     cy.url().should("match", /\/admin\/databases\?created=\d+$/);
-    cy.visit("/question/new")
+    cy.visit("/question/new");
     cy.contains("Simple question").click();
     cy.contains("MongoDB").click();
     cy.contains("Version").click();
     cy.contains("featureCompatibilityVersion");
-  })
-})
+  });
+});
