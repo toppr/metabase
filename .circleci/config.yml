@@ -575,6 +575,9 @@ jobs:
       test-files-location:
         type: string
         default: ""
+      driver:
+        type: string
+        default: ""
     executor: << parameters.e >>
     steps:
       - run-yarn-command:
@@ -587,6 +590,8 @@ jobs:
             - run:
                 name: Generate version file
                 command: ./bin/build version
+                environment:
+                  DRIVERS: h2<<# parameters.only-single-database >>,<< parameters.driver >><</ parameters.only-single-database >>
       - store_artifacts:
           path: /home/circleci/metabase/metabase/cypress
       - store_test_results:
@@ -873,6 +878,7 @@ workflows:
             - build-uberjar
             - fe-deps
           e: fe-mongo
+          driver: mongo
           only-single-database: true
           test-files-location: frontend/test/metabase/mongo
 
