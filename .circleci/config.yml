@@ -883,6 +883,9 @@ workflows:
       - build-uberjar:
           requires:
             - be-deps
+      - build-driverful-uberjar:
+          requires:
+            - be-deps
       - fe-tests-e2e:
           requires:
             - build-uberjar
