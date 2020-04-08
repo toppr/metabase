@@ -880,7 +880,7 @@ workflows:
           e: fe-mongo
           driver: mongo
           only-single-database: true
-          test-files-location: frontend/test/metabase/mongo
+          test-files-location: frontend/test/metabase-db/mongo
 
       - deploy-master:
           requires:
