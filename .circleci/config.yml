@@ -550,6 +550,28 @@ jobs:
           paths:
             - /home/circleci/metabase/metabase/target/uberjar/metabase.jar
 
+  build-driverful-uberjar:
+    executor: clojure-and-node
+    steps:
+      - attach-workspace
+      - restore-be-deps-cache
+      - restore_cache:
+          keys:
+            - uberjar-{{ checksum "./backend-checksums.txt" }}-{{ checksum "./frontend-checksums.txt" }}
+      - run:
+          name: Build uberjar if needed
+          command: >
+            if [ ! -f './target/uberjar/metabase.jar' ];
+              then ./bin/build version frontend drivers uberjar;
+            fi
+          no_output_timeout: 5m
+      - store_artifacts:
+          path: /home/circleci/metabase/metabase/target/uberjar/metabase.jar
+      - save_cache:
+          key: uberjar-{{ checksum "./backend-checksums.txt" }}-{{ checksum "./frontend-checksums.txt" }}
+          paths:
+            - /home/circleci/metabase/metabase/target/uberjar/metabase.jar
+
   fe-tests-e2e:
     executor: clojure-and-node
     steps:
@@ -590,8 +612,6 @@ jobs:
             - run:
                 name: Generate version file
                 command: ./bin/build version
-                environment:
-                  DRIVERS: h2<<# parameters.only-single-database >>,<< parameters.driver >><</ parameters.only-single-database >>
       - store_artifacts:
           path: /home/circleci/metabase/metabase/cypress
       - store_test_results:
@@ -875,7 +895,7 @@ workflows:
       - fe-tests-cypress:
           name: fe-tests-cypress-mongo
           requires:
-            - build-uberjar
+            - build-driverful-uberjar
             - fe-deps
           e: fe-mongo
           driver: mongo
