@@ -7,10 +7,13 @@ const BackendResource = require("./backend.js").BackendResource;
 
 const server = BackendResource.get({ dbKey: "" });
 
+// We currently accept two (optional) command line arguments
+// --open - Opens the Cypress test browser
+// --testFiles <path> - Specifies a different path for the integration folder
 const userArgs = process.argv.slice(2);
-const isOpenMode = userArgs[0] === "--open";
-const testFiles = userArgs[1] === "--testFiles";
-const testFilesLocation = userArgs[2];
+const isOpenMode = userArgs.includes("--open");
+const testFiles = userArgs.includes("--testFiles");
+const testFilesLocation = userArgs[userArgs.indexOf("--testFiles") + 1];
 
 function readFile(fileName) {
   return new Promise(function(resolve, reject) {
